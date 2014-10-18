@@ -151,6 +151,7 @@ else if (isset($_POST["register"])) {
   </fieldset>
   </form>
   <P>更新履歴
+  <BR>2014/10/18 GitHubに追加 https://github.com/kickzone/LanguageTrainer
   <BR>2014/10/17 統計機能に合計を追加
   <BR>2014/10/05 統計機能を実装した
   <BR>2014/09/28 単語登録時、BRタグの後に改行コードが入ったままDBに記録されてしまう問題を修正、DBの余分な改行を除去
