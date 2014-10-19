@@ -2,6 +2,7 @@
 require 'funcs.php';
 
 $message = "";
+$searchResult = -1;
 
 // セッション開始
 session_start();
@@ -20,6 +21,20 @@ else if(isset($_POST["sortButton"])){
 	//ソートする
 	$_POST["EDIT_SORT"] = $_POST["sort"];
 	unset($_POST["sortButton"]);
+}
+else if(isset($_POST["searchButton"])){
+	//検索する
+	$_POST["EDIT_SORT"] = $_POST["sort"];
+	$searchResult = DoSearch($_POST["searchWord"]);
+	if($searchResult == -1)
+	{
+		$message = $_POST["searchWord"] . "は見つかりませんでした。";
+	}
+	else
+	{
+		$message = $_POST["searchWord"] . "が見つかりました。";
+	}
+	unset($_POST["searchButton"]);
 }
 else if (isset($_POST["add"])) {
 	$_SESSION["EDITMODE"] = 1;
@@ -50,7 +65,13 @@ function MakeListBox()
 
 		$docQ = new SimpleXMLElement($row["Question"]);
 		$retStr .= "<option ";
-		$retStr .= "value=\"" . $row["ElementID"] . "\">" . htmlspecialchars($docQ->WORD, ENT_QUOTES) . "</option>";
+		$retStr .= "value=\"" . $row["ElementID"] . "\"";
+		//検索でヒットしたらそのアイテムを選択しておく
+		if($GLOBALS['searchResult'] == $row['ElementID'])
+		{
+			$retStr .= " selected";
+		}
+		$retStr .=  ">" . htmlspecialchars($docQ->WORD, ENT_QUOTES) . "</option>";
 	}
 	$retStr .= "</select>";
 
@@ -74,6 +95,25 @@ function EditSort()
 
 		}
 	}
+}
+
+//検索する
+function DoSearch($word)
+{
+	$mysqli = OpenDb();
+	$query = "SELECT * FROM ltelement WHERE TableID=" . $_SESSION["TABLEID"] . " AND Question LIKE '<r><WORD>$word%'";
+	$result = ExecQuery($mysqli, $query);
+	$ret = -1;
+
+	if($result->num_rows > 0)
+	{
+		$row = $result->fetch_assoc();
+		$ret = $row['ElementID'];
+	}
+
+	$mysqli->close();
+	return $ret;
+
 }
 
 ?>
@@ -101,6 +141,9 @@ function EditSort()
   <input type="submit" id="sort" name="sortButton" value="並べ替える">
   <BR>
   <input type="submit" id="edit" name="edit" value="編集">
+  <BR>
+  <input type="text" id="searchWord" name="searchWord" value="">
+  <input type="submit" id="search" name="searchButton" value="検索">
   <BR>
   <BR>
   <input type="submit" id="return" name="return" value="戻る">
