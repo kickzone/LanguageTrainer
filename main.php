@@ -14,6 +14,7 @@ if (!isset($_SESSION["USERID"])) {
 // 開始
 if (isset($_POST["start"])) {
 	$_SESSION["TABLEID"] = $_POST["table"];
+	$_SESSION["OLD"] =$_REQUEST["old"];
 	header("Location: question.php");
 }
 else if(isset($_POST["edit"])) {
@@ -97,6 +98,7 @@ function MakeComboBox()
   <input type="submit" id="edit" name="edit" value="編集">
   <input type="submit" id="list" name="list" value="一覧表示">
   <BR>
+  <input type="checkbox" id="old" name="old" value="1">復習モード<BR>
   <label for="userid">新規作成する問題集：</label><input type="text" id="newTableName" name="newTableName" value="">
   <input type="submit" id="newTable" name="newTable" value="作成"><BR>
   <input type="submit" id="stat" name="stat" value="統計">

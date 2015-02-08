@@ -91,6 +91,30 @@ function SelectQuestion($UserID, $TableID){
 
 	$mysqli = OpenDb();
 
+	//2015/02/08 復習モード
+	if($_SESSION["OLD"] == "1"){
+		$condDate = date("y/m/d", strtotime("-60 day"));
+		$query = "SELECT * FROM ltlog WHERE UserID=" . $UserID . " AND TableID=" . $TableID . " AND ltlog.Flag=5 AND Time<='"  . $condDate . "'";
+		$result = ExecQuery($mysqli, $query);
+		if($result->num_rows == 0)
+		{
+			$GLOBALS['message'] = "復習する問題がありません。";
+			$mysqli->close();
+			return 0;
+		}
+		$rndNum = rand(0, $result->num_rows-1);
+		$result->data_seek($rndNum);
+		$row = $result->fetch_assoc();
+		$reviewElementNo = $row["ElementID"];
+		$reviewElementNums = $result->num_rows;
+		$GLOBALS['message'] = "1か月後の復習が終わってから60日以上経過した問題です。あと".$result->num_rows."問復習できます。";
+		$_SESSION["ltlogCount"] = $row["Count"];
+		$_SESSION["ltlogFlag"] = $row["Flag"];
+		$_SESSION["bUpdateFlag"] = true;
+		$_SESSION["bInsert"] = false;
+		return $row["ElementID"];
+	}
+
 	//選択条件に当てはまるものからリターンする
 	$reviewElementNo = 0;
 	$reviewElementNums = 0;
