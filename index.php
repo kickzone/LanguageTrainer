@@ -151,6 +151,8 @@ else if (isset($_POST["register"])) {
   </fieldset>
   </form>
   <P>更新履歴
+  <BR>2015/04/19 「記録してからこの問題を修正」を追加
+  <BR>2015/03/01 復習モード追加
   <BR>2014/10/19 編集画面に検索機能を追加
   <BR>2014/10/18 GitHubに追加 https://github.com/kickzone/LanguageTrainer
   <BR>2014/10/17 統計機能に合計を追加

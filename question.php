@@ -20,7 +20,7 @@ if (!isset($_SESSION["USERID"])) {
 $UserID = $_SESSION["USERID"];
 $TableID = $_SESSION["TABLEID"];
 // 初回表示時：問題を表示する
-if (!isset($_POST["registAndNext"]) && !isset($_POST["registAndBack"])) {
+if (!isset($_POST["registAndNext"]) && !isset($_POST["registAndBack"]) && !isset($_POST["registAndEdit"])) {
 
 	$ElementID = SelectQuestion($UserID, $TableID);
 	//1問も問題がなかったなど、エラー時
@@ -58,8 +58,12 @@ else{
 		//「覚えていた！」ならFlagをインクリメント
 		//「なんとなく覚えていた」ならFlagはインクリメントしない
 		//「忘れた。。」ならFlagはデクリメントする
+		// 復習モードならFlagは0にする
 		if($bUpdateFlag && $memory == 2) $ltlogFlag++;
-		if($memory == 0 && $ltLogFlag > 1) $ltlogFlag--;
+		if($memory == 0){
+			if($_SESSION["OLD"] == "1") $ltlogFlag = 1;
+			else if($ltLogFlag > 1) $ltlogFlag--;
+		}
 		$ltlogCount++;
 		$query = "UPDATE ltlog SET Memory=" . $memory . ", Flag=" . $ltlogFlag . ", Count=" . $ltlogCount . ", Time='" . date("y/m/d") .
 			"' WHERE UserID=" . $UserID . " AND TableID=" . $TableID . " AND ElementID=" . $ElementID;
@@ -70,6 +74,12 @@ else{
 		//問題集選択へ戻る
 		$_POST = array();
 		header("Location: main.php");
+	}else if(isSet($_POST["registAndEdit"])){
+		//記録後編集
+		$_POST = array();
+		$_SESSION["EDITMODE"] = 2;
+		$_SESSION["ElementID"] = $ElementID;
+		header("Location: editmain.php");
 	}
 	else{
 		//次の問題へ
@@ -301,6 +311,7 @@ function dispAnswer(){
 		<BR>
 		<input type="submit" id="registAndNext" name="registAndNext" value="記録して次の問題へ">
 		<input type="submit" id="registAndBack" name="registAndBack" value="記録して問題集選択画面に戻る">
+		<input type="submit" id="registAndEdit" name="registAndEdit" value="記録してからこの問題を修正">
 	</fieldset>
 	</form>
 </div>
